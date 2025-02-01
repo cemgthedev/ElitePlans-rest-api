@@ -1,3 +1,4 @@
+### Criação de um exercício
 POST http://localhost:8000/exercises
 Content-Type: application/json
 
@@ -8,6 +9,21 @@ Content-Type: application/json
   "weight": 80.0,
   "tutorial_url": "https://www.exemplo.com/tutorial/agachamento",
   "workout_id": "679da2654a6926d21a9c70dd",
+  "created_at": "2025-02-01T12:00:00",
+  "updated_at": null
+}
+
+### Atualização de um exercício
+PUT http://localhost:8000/exercises/679da4154dce0f96709da107
+Content-Type: application/json
+
+{
+  "title": "Agachamento com barra updated",
+  "n_sections": 3,
+  "n_reps": 12,
+  "weight": 80.0,
+  "tutorial_url": "https://www.exemplo.com/tutorial/agachamento",
+  "workout_id": "679e26944d46ef4fef2b28d7",
   "created_at": "2025-02-01T12:00:00",
   "updated_at": null
 }
