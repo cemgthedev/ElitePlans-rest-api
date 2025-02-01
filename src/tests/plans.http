@@ -23,3 +23,6 @@ Content-Type: application/json
   "price": 99.99,
   "seller_id": "679d9e51ab0051798fd5f71e"
 }
+
+### Remoção de um plano
+DELETE http://localhost:8000/plans/679d9f3758e143db4df606d7
