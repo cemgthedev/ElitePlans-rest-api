@@ -1,0 +1,7 @@
+POST http://localhost:8000/plan_workouts
+Content-Type: application/json
+
+{
+  "plan_id": "679d9f3758e143db4df606d7",
+  "workout_id": "679da2654a6926d21a9c70dd"
+}
