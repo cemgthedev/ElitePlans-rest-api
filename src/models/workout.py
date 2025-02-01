@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 
 class Workout(BaseModel):
-    id: Optional[str] = Field(alias="_id")
+    id: Optional[str] = Field(None, alias="_id")
     title: str = Field(min_length=3, max_length=120)
     description: str = Field(min_length=3)
     rest_time: int = Field(min_length=0)
