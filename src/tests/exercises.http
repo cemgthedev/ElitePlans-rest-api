@@ -33,3 +33,9 @@ DELETE http://localhost:8000/exercises/679da4154dce0f96709da107
 
 ### Busca de um exercício por id
 GET http://localhost:8000/exercises/679da4174dce0f96709da108
+
+### Quantidade de exercícios
+GET http://localhost:8000/quantity/exercises
+
+### Quantidade de exercícios
+GET http://localhost:8000/quantity/exercises/679da2654a6926d21a9c70dd
