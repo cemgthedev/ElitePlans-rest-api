@@ -15,10 +15,12 @@ async def create_plan_workout(plan_workout: PlanWorkouts):
         
         plan = await db.plans.find_one({"_id": ObjectId(plan_workout.plan_id)})
         if not plan:
+            plan_workouts_logger.warning(f'Plano não encontrado: {plan_workout.plan_id}')
             raise HTTPException(status_code=404, detail='Plano não encontrado')
         
         workout = await db.workouts.find_one({"_id": ObjectId(plan_workout.workout_id)})
         if not workout:
+            plan_workouts_logger.warning(f'Treino não encontrado: {plan_workout.workout_id}')
             raise HTTPException(status_code=404, detail='Treino não encontrado')
         
         plan_workout_dict = plan_workout.dict(by_alias=True, exclude={"id"})
