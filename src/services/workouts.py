@@ -70,3 +70,22 @@ async def delete_workout(id: str):
     except Exception as e:
         workouts_logger.error(f'Erro ao excluir treino: {e}')
         raise HTTPException(status_code=500, detail='Erro ao excluir treino')
+    
+# Rota de busca de um treino por id
+@router.get('/workouts/{id}')
+async def get_workout(id: str):
+    try:
+        workouts_logger.info(f'Buscando treino: {id}')
+        workout = await db.workouts.find_one({"_id": ObjectId(id)})
+
+        if not workout:
+            workouts_logger.warning(f'Treino não encontrado: {id}')
+            raise HTTPException(status_code=404, detail='Treino não encontrado')
+
+        workout["_id"] = str(workout["_id"])
+        workouts_logger.info(f'Treino encontrado: {workout}')
+        return workout
+
+    except Exception as e:
+        workouts_logger.error(f'Erro ao buscar treino: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar treino')
