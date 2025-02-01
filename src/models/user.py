@@ -11,6 +11,7 @@ class User(BaseModel):
     email: str = Field(alias="email do usuário", min_length=3, max_length=80)
     password: str = Field(alias="senha do usuário", min_length=8, max_length=16)
     cpf: str = Field(alias="cpf", min_length=11, max_length=11)
-    plans: Optional[List['Plan']] = Field(alias="ids de planos do usuário", default=[])
+    purchased_plans: Optional[List['Plan']] = Field(alias="planos comprados pelo usuário", default=[])
+    created_plans: Optional[List['Plan']] = Field(alias="planos criados pelo usuário", default=[])
     created_at: datetime = Field(alias="data de criação", default_factory=datetime.now)
     updated_at: Optional[datetime] = Field(alias="data da última atualização")

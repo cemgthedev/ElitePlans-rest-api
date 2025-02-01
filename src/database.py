@@ -15,7 +15,8 @@ client = AsyncIOMotorClient(MONGO_URI)
 db = client["eliteplans"]
 
 # Criação de índices para performance das consultas mais relevantes
-db.userplans.create_index([('user_id', 1), ('plan_id', 1)])       # Busca de ids de planos de um usuário
+db.userplans.create_index([('seller_id', 1), ('plan_id', 1)])     # Busca de ids de planos de um vendedor
+db.userplans.create_index([('buyer_id', 1), ('plan_id', 1)])      # Busca de ids de planos de um comprador
 db.planworkouts.create_index([('plan_id', 1), ('workout_id', 1)]) # Busca de ids de treinos de um plano
 db.exercises.create_index("workout_id")                           # Busca de exercícios de um treino
 
