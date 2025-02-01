@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 
 class UserPlans(BaseModel):
-    id: Optional[str] = Field(alias="_id")
+    id: Optional[str] = Field(None, alias="_id")
     seller_id: str
     buyer_id: str
     plan_id: str

@@ -2,9 +2,8 @@ POST http://localhost:8000/users
 Content-Type: application/json
 
 {
-  "_id": "123456789",
   "name": "João Silva",
-  "email": "joao.silva@email.com",
+  "email": "joao.sidlva@email.com",
   "password": "senha1234",
   "cpf": "12345678901",
   "phone_number": "+55 11 91234-5678",

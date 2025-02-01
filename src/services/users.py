@@ -10,7 +10,7 @@ router = APIRouter()
 @router.post('/users')
 async def create_user(user: User):
     try:
-        users_logger.info(f'Criando usuário com id: {user.id}')
+        users_logger.info(f'Criando usuário: {user}')
         user_dict = user.dict(by_alias=True, exclude={"id"})
         new_user = await db.users.insert_one(user_dict)
         
@@ -19,6 +19,7 @@ async def create_user(user: User):
             raise HTTPException(status_code=500, detail='Erro ao criar usuário')
         
         created_user["_id"] = str(created_user["_id"])
+        users_logger.info(f'Usuário criado com sucesso: {created_user}')
         return created_user
     
     except Exception as e:
