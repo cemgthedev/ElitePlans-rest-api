@@ -90,3 +90,21 @@ async def update_user_plan(id: str, user_plan: UserPlans):
     except Exception as e:
         user_plans_logger.error(f'Erro ao atualizar plano de treino para usuário: {e}')
         raise HTTPException(status_code=500, detail='Erro ao atualizar plano de treino para usuário')
+    
+# Rota de exclusão de um plano de treino para um usuário
+@router.delete('/user_plans/{id}')
+async def delete_user_plan(id: str):
+    try:
+        user_plans_logger.info(f'Excluindo plano de treino para usuário: {id}')
+        response = await db.user_plans.delete_one({"_id": ObjectId(id)})
+        
+        if response.deleted_count == 0:
+            user_plans_logger.warning(f'Plano de treino para usuário não encontrado: {id}')
+            raise HTTPException(status_code=404, detail='Plano de treino para usuário não encontrado')
+        
+        user_plans_logger.info(f'Plano de treino para usuário excluído com sucesso: {id}')
+        return {"message": "Plano de treino para usuário excluído com sucesso"}
+    
+    except Exception as e:
+        user_plans_logger.error(f'Erro ao excluir plano de treino para usuário: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao excluir plano de treino para usuário')
