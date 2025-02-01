@@ -83,3 +83,22 @@ async def delete_plan(id: str):
     except Exception as e:
         plans_logger.error(f'Erro ao excluir plano: {e}')
         raise HTTPException(status_code=500, detail='Erro ao excluir plano')
+    
+# Rota de busca de um plano por id
+@router.get('/plans/{id}')
+async def get_plan(id: str):
+    try:
+        plans_logger.info(f'Buscando plano: {id}')
+        plan = await db.plans.find_one({"_id": ObjectId(id)})
+        
+        if not plan:
+            plans_logger.warning(f'Plano não encontrado: {id}')
+            raise HTTPException(status_code=404, detail='Plano não encontrado')
+        
+        plan["_id"] = str(plan["_id"])
+        plans_logger.info(f'Plano encontrado: {plan}')
+        return plan
+    
+    except Exception as e:
+        plans_logger.error(f'Erro ao buscar plano: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar plano')
