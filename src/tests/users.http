@@ -35,3 +35,6 @@ DELETE http://localhost:8000/users/679d9e36ef936b8a7a1ecee7
 
 ### Busca de um usuário pelo id
 GET http://localhost:8000/users/679e77d66f2b139bd60798ab
+
+### Quantidade de usuários
+GET http://localhost:8000/quantity/users

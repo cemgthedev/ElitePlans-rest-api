@@ -89,3 +89,17 @@ async def get_user(id: str):
     except Exception as e:
         users_logger.error(f'Erro ao buscar usuário: {e}')
         raise HTTPException(status_code=500, detail='Erro ao buscar usuário')
+    
+# Rota de quantidade de usuários
+@router.get('/quantity/users')
+async def get_users_quantity():
+    try:
+        users_logger.info(f'Buscando quantidade de usuários')
+        quantity = await db.users.count_documents({})
+
+        users_logger.info(f'Quantidade de usuários encontrada com sucesso: {quantity}')
+        return {"quantity": quantity}
+
+    except Exception as e:
+        users_logger.error(f'Erro ao buscar quantidade de usuários: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar quantidade de usuários')
