@@ -15,7 +15,6 @@ async def get_db(db = Depends(get_db)):
         await db.command("ping")
         return {"message": "Bem vindo ao ElitePlans"}
     except Exception as e:
-        print(e)
         return {"message": "Ops! Erro ao conectar-se ao banco de dados..."}
 
 # Adicionando rotas de usuários
