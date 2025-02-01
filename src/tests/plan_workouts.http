@@ -9,3 +9,9 @@ Content-Type: application/json
 
 ### Remoção de treino para plano
 DELETE http://localhost:8000/plan_workouts/679da57589b0825e9504911a
+
+### Quantidade de treinos dos planos
+GET http://localhost:8000/quantity/plan_workouts
+
+### Quantidade de treinos de um dado plano
+GET http://localhost:8000/quantity/plan_workouts/679d9f3758e143db4df606d7

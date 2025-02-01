@@ -56,3 +56,31 @@ async def delete_plan_workout(id: str):
     except Exception as e:
         plan_workouts_logger.error(f'Erro ao excluir treino do plano: {e}')
         raise HTTPException(status_code=500, detail='Erro ao excluir treino do plano')
+    
+# Rota de quantidade de treinos dos planos
+@router.get('/quantity/plan_workouts')
+async def get_plan_workouts_quantity():
+    try:
+        plan_workouts_logger.info(f'Buscando quantidade de treinos dos planos')
+        quantity = await db.plan_workouts.count_documents({})
+
+        plan_workouts_logger.info(f'Quantidade de treinos dos planos encontrada com sucesso: {quantity}')
+        return {"quantity": quantity}
+
+    except Exception as e:
+        plan_workouts_logger.error(f'Erro ao buscar quantidade de treinos dos planos: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar quantidade de treinos dos planos')
+    
+# Rota de quantidade de treinos do plano
+@router.get('/quantity/plan_workouts/{id}')
+async def get_workouts_quantity_by_plan(id: str):
+    try:
+        plan_workouts_logger.info(f'Buscando quantidade de treinos do plano: {id}')
+        quantity = await db.plan_workouts.count_documents({"plan_id": id})
+
+        plan_workouts_logger.info(f'Quantidade de treinos do plano encontrada com sucesso: {quantity}')
+        return {"quantity": quantity}
+
+    except Exception as e:
+        plan_workouts_logger.error(f'Erro ao buscar quantidade de treinos do plano: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar quantidade de treinos do plano')
