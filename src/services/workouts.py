@@ -24,3 +24,4 @@ async def create_workout(workout: Workout):
 
     except Exception as e:
         workouts_logger.error(f'Erro ao criar treino: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao criar treino')
