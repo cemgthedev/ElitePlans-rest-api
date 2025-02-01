@@ -1,0 +1,8 @@
+POST http://localhost:8000/user_plans
+Content-Type: application/json
+
+{
+  "seller_id": "679d9e36ef936b8a7a1ecee7",
+  "buyer_id": "679d9e51ab0051798fd5f71e",
+  "plan_id": "679d9f3758e143db4df606d7"
+}

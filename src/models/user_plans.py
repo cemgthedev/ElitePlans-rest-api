@@ -7,6 +7,6 @@ class UserPlans(BaseModel):
     seller_id: str
     buyer_id: str
     plan_id: str
-    purchased: bool = Field(default_factory=False)
+    purchased: bool = Field(default=False)
     purchased_at: Optional[datetime] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.now)
