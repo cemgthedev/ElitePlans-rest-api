@@ -1,0 +1,12 @@
+### Criar um novo plano
+POST http://localhost:8000/plans
+Content-Type: application/json
+
+{
+  "title": "Plano Premium",
+  "description": "Acesso completo a todas as funcionalidades.",
+  "type": "Mensal",
+  "category": "Fitness",
+  "price": 99.99,
+  "seller_id": "679d9ef658e143db4df606d6"
+}
