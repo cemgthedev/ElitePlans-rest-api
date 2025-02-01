@@ -24,10 +24,11 @@ async def create_plan_workout(plan_workout: PlanWorkouts):
             raise HTTPException(status_code=404, detail='Treino não encontrado')
         
         plan_workout_dict = plan_workout.dict(by_alias=True, exclude={"id"})
-        new_plan_workout = await db.plan_workouts.insert_one(plan_workout_dict)
+        response = await db.plan_workouts.insert_one(plan_workout_dict)
 
-        created_plan_workout = await db.plan_workouts.find_one({"_id": new_plan_workout.inserted_id})
+        created_plan_workout = await db.plan_workouts.find_one({"_id": response.inserted_id})
         if not created_plan_workout:
+            plan_workouts_logger.error(f'Erro ao criar plano de treino: {plan_workout}')
             raise HTTPException(status_code=500, detail='Erro ao criar plano de treino')
 
         created_plan_workout["_id"] = str(created_plan_workout["_id"])

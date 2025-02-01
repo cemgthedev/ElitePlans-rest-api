@@ -1,8 +1,20 @@
+### Criação de plano para usuário
 POST http://localhost:8000/user_plans
 Content-Type: application/json
 
 {
   "seller_id": "679d9e36ef936b8a7a1ecee7",
-  "buyer_id": "679d9e51ab0051798fd5f71e",
+  "buyer_id": "679d9e54ab0051798fd5f71f",
   "plan_id": "679d9f3758e143db4df606d7"
+}
+
+### Atualização de plano para usuário
+PUT http://localhost:8000/user_plans/679e32a7dbbb3d374893dfa2
+Content-Type: application/json
+
+{
+  "seller_id": "679d9e36ef936b8a7a1ecee7",
+  "buyer_id": "679d9e54ab0051798fd5f71f",
+  "plan_id": "679d9f3758e143db4df606d7",
+  "purchased": true
 }

@@ -33,8 +33,8 @@ async def create_exercise(exercise: Exercise):
         raise HTTPException(status_code=500, detail='Erro ao criar exercício')
     
 # Rota de atualização de um exercício
-@router.put('/exercises/{exercise_id}')
-async def update_exercise(exercise_id: str, exercise: Exercise):
+@router.put('/exercises/{id}')
+async def update_exercise(id: str, exercise: Exercise):
     try:
         exercises_logger.info(f'Atualizando exercício: {exercise}')
         workout = await db.workouts.find_one({"_id": ObjectId(exercise.workout_id)})
@@ -43,12 +43,17 @@ async def update_exercise(exercise_id: str, exercise: Exercise):
             raise HTTPException(status_code=404, detail='Treino não encontrado')
         
         exercise_dict = exercise.dict(by_alias=True, exclude={"id"})
-        updated_exercise = await db.exercises.update_one({"_id": ObjectId(exercise_id)}, {"$set": exercise_dict})
+        response = await db.exercises.update_one({"_id": ObjectId(id)}, {"$set": exercise_dict})
 
-        if updated_exercise.matched_count == 0:
+        if response.matched_count == 0:
+            exercises_logger.warning(f'Exercício não encontrado: {id}')
             raise HTTPException(status_code=404, detail='Exercício não encontrado')
+        
+        if response.modified_count == 0:
+            exercises_logger.warning(f'Nenhuma alteração foi feita no exercício: {exercise}')
+            raise HTTPException(status_code=500, detail='Nenhuma alteração foi feita no exercício')
 
-        updated_exercise = await db.exercises.find_one({"_id": ObjectId(exercise_id)})
+        updated_exercise = await db.exercises.find_one({"_id": ObjectId(id)})
         updated_exercise["_id"] = str(updated_exercise["_id"])
         exercises_logger.info(f'Exercício atualizado com sucesso: {updated_exercise}')
         return updated_exercise
