@@ -1,0 +1,84 @@
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  detailed:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: detailed
+    stream: ext://sys.stdout
+
+  file_users:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: detailed
+    filename: "./logs/users.log"
+
+  file_plans:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: detailed
+    filename: "./logs/plans.log"
+  
+  file_workouts:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: detailed
+    filename: "./logs/workouts.log"
+
+  file_exercises:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: detailed
+    filename: "./logs/exercises.log"
+
+  file_user_plans:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: detailed
+    filename: "./logs/user_plans.log"
+
+  file_plan_workouts:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: detailed
+    filename: "./logs/plan_workouts.log"
+
+loggers:
+  users:
+    level: DEBUG
+    handlers: [console, file_users]
+    propagate: false
+
+  plans:
+    level: DEBUG
+    handlers: [console, file_plans]
+    propagate: false
+
+  workouts:
+    level: DEBUG
+    handlers: [console, file_workouts]
+    propagate: false
+  
+  exercises:
+    level: DEBUG
+    handlers: [console, file_exercises]
+    propagate: false
+
+  user_plans:
+    level: DEBUG
+    handlers: [console, file_user_plans]
+    propagate: false
+  
+  plan_workouts:
+    level: DEBUG
+    handlers: [console, file_plan_workouts]
+    propagate: false
+
+root:
+  level: WARNING
+  handlers: [console]
