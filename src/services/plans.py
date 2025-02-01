@@ -102,3 +102,17 @@ async def get_plan(id: str):
     except Exception as e:
         plans_logger.error(f'Erro ao buscar plano: {e}')
         raise HTTPException(status_code=500, detail='Erro ao buscar plano')
+    
+# Rota de quantidade de planos
+@router.get('/quantity/plans')
+async def get_plans_quantity():
+    try:
+        plans_logger.info(f'Buscando quantidade de planos')
+        quantity = await db.plans.count_documents({})
+
+        plans_logger.info(f'Quantidade de planos encontrada com sucesso: {quantity}')
+        return {"quantity": quantity}
+
+    except Exception as e:
+        plans_logger.error(f'Erro ao buscar quantidade de planos: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar quantidade de planos')
