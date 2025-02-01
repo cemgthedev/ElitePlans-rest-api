@@ -89,3 +89,17 @@ async def get_workout(id: str):
     except Exception as e:
         workouts_logger.error(f'Erro ao buscar treino: {e}')
         raise HTTPException(status_code=500, detail='Erro ao buscar treino')
+    
+# Rota de quantidade de treinos
+@router.get('/quantity/workouts')
+async def get_workouts_quantity():
+    try:
+        workouts_logger.info(f'Buscando quantidade de treinos')
+        quantity = await db.workouts.count_documents({})
+
+        workouts_logger.info(f'Quantidade de treinos encontrada com sucesso: {quantity}')
+        return {"quantity": quantity}
+
+    except Exception as e:
+        workouts_logger.error(f'Erro ao buscar quantidade de treinos: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar quantidade de treinos')
