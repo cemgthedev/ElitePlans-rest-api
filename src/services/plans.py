@@ -35,8 +35,8 @@ async def create_plan(plan: Plan):
         raise HTTPException(status_code=500, detail='Erro ao criar plano')
     
 # Rota de atualização de um plano
-@router.put('/plans/{plan_id}')
-async def update_plan(plan_id: str, plan: Plan):
+@router.put('/plans/{id}')
+async def update_plan(id: str, plan: Plan):
     try:
         plans_logger.info(f'Atualizando plano: {plan}')
         
@@ -46,7 +46,7 @@ async def update_plan(plan_id: str, plan: Plan):
             raise HTTPException(status_code=404, detail='Vendedor não encontrado')
         
         plan_dict = plan.dict(by_alias=True, exclude={"id"})
-        response = await db.plans.update_one({"_id": ObjectId(plan_id)}, {"$set": plan_dict})
+        response = await db.plans.update_one({"_id": ObjectId(id)}, {"$set": plan_dict})
         
         if response.matched_count == 0:
             plans_logger.warning(f'Plano não encontrado: {id}')
@@ -56,7 +56,7 @@ async def update_plan(plan_id: str, plan: Plan):
             plans_logger.warning(f'Nenhuma alteração foi feita no plano: {plan}')
             raise HTTPException(status_code=500, detail='Nenhuma alteração foi feita no plano')
         
-        updated_plan = await db.plans.find_one({"_id": ObjectId(plan_id)})
+        updated_plan = await db.plans.find_one({"_id": ObjectId(id)})
         updated_plan["_id"] = str(updated_plan["_id"])
         plans_logger.info(f'Plano atualizado com sucesso: {updated_plan}')
         return updated_plan
@@ -64,3 +64,22 @@ async def update_plan(plan_id: str, plan: Plan):
     except Exception as e:
         plans_logger.error(f'Erro ao atualizar plano: {e}')
         raise HTTPException(status_code=500, detail='Erro ao atualizar plano')
+    
+# Rota de exclusão de um plano
+@router.delete('/plans/{id}')
+async def delete_plan(id: str):
+    try:
+        plans_logger.info(f'Excluindo plano: {id}')
+        await db.user_plans.delete_many({"plan_id": ObjectId(id)})
+        response = await db.plans.delete_one({"_id": ObjectId(id)})
+        
+        if response.deleted_count == 0:
+            plans_logger.warning(f'Plano não encontrado: {id}')
+            raise HTTPException(status_code=404, detail='Plano não encontrado')
+        
+        plans_logger.info(f'Plano excluído com sucesso: {id}')
+        return {"message": "Plano excluído com sucesso"}
+    
+    except Exception as e:
+        plans_logger.error(f'Erro ao excluir plano: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao excluir plano')
