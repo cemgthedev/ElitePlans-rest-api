@@ -108,3 +108,45 @@ async def delete_user_plan(id: str):
     except Exception as e:
         user_plans_logger.error(f'Erro ao excluir plano de treino para usuário: {e}')
         raise HTTPException(status_code=500, detail='Erro ao excluir plano de treino para usuário')
+    
+# Rota de quantidade de planos dos usuários
+@router.get('/quantity/user_plans')
+async def get_user_plans_quantity():
+    try:
+        user_plans_logger.info(f'Buscando quantidade de planos dos usuários')
+        quantity = await db.user_plans.count_documents({})
+
+        user_plans_logger.info(f'Quantidade de planos dos usuários encontrada com sucesso: {quantity}')
+        return {"quantity": quantity}
+
+    except Exception as e:
+        user_plans_logger.error(f'Erro ao buscar quantidade de planos dos usuários: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar quantidade de planos dos usuários')
+    
+# Rota de quantidade de planos de um vendedor
+@router.get('/quantity/user_plans/seller/{id}')
+async def get_user_plans_quantity_by_seller(id: str):
+    try:
+        user_plans_logger.info(f'Buscando quantidade de planos do vendedor: {id}')
+        quantity = await db.user_plans.count_documents({"seller_id": id})
+
+        user_plans_logger.info(f'Quantidade de planos do vendedor encontrada com sucesso: {quantity}')
+        return {"quantity": quantity}
+
+    except Exception as e:
+        user_plans_logger.error(f'Erro ao buscar quantidade de planos do vendedor: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar quantidade de planos do vendedor')
+    
+# Rota de quantidade de planos de um comprador
+@router.get('/quantity/user_plans/buyer/{id}')
+async def get_user_plans_quantity_by_buyer(id: str):
+    try:
+        user_plans_logger.info(f'Buscando quantidade de planos do comprador: {id}')
+        quantity = await db.user_plans.count_documents({"buyer_id": id})
+
+        user_plans_logger.info(f'Quantidade de planos do comprador encontrada com sucesso: {quantity}')
+        return {"quantity": quantity}
+
+    except Exception as e:
+        user_plans_logger.error(f'Erro ao buscar quantidade de planos do comprador: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar quantidade de planos do comprador')
