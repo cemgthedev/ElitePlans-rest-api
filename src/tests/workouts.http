@@ -13,7 +13,7 @@ Content-Type: application/json
 }
 
 ### Atualização de um treino
-PUT http://localhost:8000/workouts/679da2654a6926d21a9c70dd
+PUT http://localhost:8000/workouts/679e26944d46ef4fef2b28d7
 Content-Type: application/json
 
 {

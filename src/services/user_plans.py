@@ -15,14 +15,17 @@ async def create_user_plan(user_plan: UserPlans):
         
         seller = await db.users.find_one({"_id": ObjectId(user_plan.seller_id)})
         if not seller:
+            user_plans_logger.warning(f'Vendedor não encontrado: {user_plan.seller_id}')
             raise HTTPException(status_code=404, detail='Vendedor não encontrado')
         
         buyer = await db.users.find_one({"_id": ObjectId(user_plan.buyer_id)})
         if not buyer:
+            user_plans_logger.warning(f'Comprador não encontrado: {user_plan.buyer_id}')
             raise HTTPException(status_code=404, detail='Comprador não encontrado')
         
         plan = await db.plans.find_one({"_id": ObjectId(user_plan.plan_id)})
         if not plan:
+            user_plans_logger.warning(f'Plano não encontrado: {user_plan.plan_id}')
             raise HTTPException(status_code=404, detail='Plano não encontrado')
         
         user_plan_dict = user_plan.dict(by_alias=True, exclude={"id"})
