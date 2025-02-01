@@ -13,9 +13,9 @@ async def create_user(user: User):
     try:
         users_logger.info(f'Criando usuário: {user}')
         user_dict = user.dict(by_alias=True, exclude={"id"})
-        new_user = await db.users.insert_one(user_dict)
+        response = await db.users.insert_one(user_dict)
         
-        created_user = await db.users.find_one({"_id": new_user.inserted_id})
+        created_user = await db.users.find_one({"_id": response.inserted_id})
         if not created_user:
             raise HTTPException(status_code=500, detail='Erro ao criar usuário')
         
@@ -28,17 +28,22 @@ async def create_user(user: User):
         raise HTTPException(status_code=500, detail='Erro ao criar usuário')
     
 # Rota de atualização de um usuário
-@router.put('/users/{user_id}')
-async def update_user(user_id: str, user: User):
+@router.put('/users/{id}')
+async def update_user(id: str, user: User):
     try:
         users_logger.info(f'Atualizando usuário: {user}')
         user_dict = user.dict(by_alias=True, exclude={"id"})
-        updated_user = await db.users.update_one({"_id": ObjectId(user_id)}, {"$set": user_dict})
+        response = await db.users.update_one({"_id": ObjectId(id)}, {"$set": user_dict})
         
-        if updated_user.matched_count == 0:
+        if response.matched_count == 0:
+            users_logger.warning(f'Usuário não encontrado: {id}')
             raise HTTPException(status_code=404, detail='Usuário não encontrado')
         
-        updated_user = await db.users.find_one({"_id": ObjectId(user_id)})
+        if response.modified_count == 0:
+            users_logger.warning(f'Nenhuma alteração foi feita no usuário: {user}')
+            raise HTTPException(status_code=500, detail='Nenhuma alteração foi feita no usuário')
+        
+        updated_user = await db.users.find_one({"_id": ObjectId(id)})
         updated_user["_id"] = str(updated_user["_id"])
         users_logger.info(f'Usuário atualizado com sucesso: {updated_user}')
         return updated_user

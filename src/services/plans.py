@@ -19,10 +19,11 @@ async def create_plan(plan: Plan):
             raise HTTPException(status_code=404, detail='Vendedor não encontrado')
         
         plan_dict = plan.dict(by_alias=True, exclude={"id"})
-        new_plan = await db.plans.insert_one(plan_dict)
+        response = await db.plans.insert_one(plan_dict)
         
-        created_plan = await db.plans.find_one({"_id": new_plan.inserted_id})
+        created_plan = await db.plans.find_one({"_id": response.inserted_id})
         if not created_plan:
+            plans_logger.error(f'Erro ao criar plano: {plan}')
             raise HTTPException(status_code=500, detail='Erro ao criar plano')
         
         created_plan["_id"] = str(created_plan["_id"])
@@ -45,10 +46,15 @@ async def update_plan(plan_id: str, plan: Plan):
             raise HTTPException(status_code=404, detail='Vendedor não encontrado')
         
         plan_dict = plan.dict(by_alias=True, exclude={"id"})
-        updated_plan = await db.plans.update_one({"_id": ObjectId(plan_id)}, {"$set": plan_dict})
+        response = await db.plans.update_one({"_id": ObjectId(plan_id)}, {"$set": plan_dict})
         
-        if updated_plan.matched_count == 0:
+        if response.matched_count == 0:
+            plans_logger.warning(f'Plano não encontrado: {id}')
             raise HTTPException(status_code=404, detail='Plano não encontrado')
+        
+        if response.modified_count == 0:
+            plans_logger.warning(f'Nenhuma alteração foi feita no plano: {plan}')
+            raise HTTPException(status_code=500, detail='Nenhuma alteração foi feita no plano')
         
         updated_plan = await db.plans.find_one({"_id": ObjectId(plan_id)})
         updated_plan["_id"] = str(updated_plan["_id"])

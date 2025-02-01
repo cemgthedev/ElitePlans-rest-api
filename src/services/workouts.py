@@ -13,9 +13,9 @@ async def create_workout(workout: Workout):
     try:
         workouts_logger.info(f'Criando treino: {workout}')
         workout_dict = workout.dict(by_alias=True, exclude={"id"})
-        new_workout = await db.workouts.insert_one(workout_dict)
+        response = await db.workouts.insert_one(workout_dict)
 
-        created_workout = await db.workouts.find_one({"_id": new_workout.inserted_id})
+        created_workout = await db.workouts.find_one({"_id": response.inserted_id})
         if not created_workout:
             raise HTTPException(status_code=500, detail='Erro ao criar treino')
 
@@ -28,17 +28,22 @@ async def create_workout(workout: Workout):
         raise HTTPException(status_code=500, detail='Erro ao criar treino')
     
 # Rota de atualização de um treino
-@router.put('/workouts/{workout_id}')
-async def update_workout(workout_id: str, workout: Workout):
+@router.put('/workouts/{id}')
+async def update_workout(id: str, workout: Workout):
     try:
         workouts_logger.info(f'Atualizando treino: {workout}')
         workout_dict = workout.dict(by_alias=True, exclude={"id"})
-        updated_workout = await db.workouts.update_one({"_id": ObjectId(workout_id)}, {"$set": workout_dict})
+        response = await db.workouts.update_one({"_id": ObjectId(id)}, {"$set": workout_dict})
 
-        if updated_workout.matched_count == 0:
+        if response.matched_count == 0:
+            workouts_logger.warning(f'Treino não encontrado: {id}')
             raise HTTPException(status_code=404, detail='Treino não encontrado')
+        
+        if response.modified_count == 0:
+            workouts_logger.warning(f'Nenhuma alteração foi feita no treino: {workout}')
+            raise HTTPException(status_code=500, detail='Nenhuma alteração foi feita no treino')
 
-        updated_workout = await db.workouts.find_one({"_id": ObjectId(workout_id)})
+        updated_workout = await db.workouts.find_one({"_id": ObjectId(id)})
         updated_workout["_id"] = str(updated_workout["_id"])
         workouts_logger.info(f'Treino atualizado com sucesso: {updated_workout}')
         return updated_workout

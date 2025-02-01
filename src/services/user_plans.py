@@ -73,16 +73,19 @@ async def update_user_plan(id: str, user_plan: UserPlans):
             response = await db.user_plans.update_one({"_id": ObjectId(id)}, {"$set": update_data})
             
             if response.matched_count == 0:
-                user_plans_logger.warning(f'Erro ao atualizar plano de treino para usuário: {user_plan}')
-                raise HTTPException(status_code=404, detail='Erro ao atualizar plano de treino para usuário')
+                user_plans_logger.warning(f'Plano de treino para usuário não encontrado: {id}')
+                raise HTTPException(status_code=404, detail='Plano de treino para usuário não encontrado')
+            elif response.modified_count == 0:
+                user_plans_logger.warning(f'Nenhuma alteração foi feita no plano de treino para usuário: {plan}')
+                raise HTTPException(status_code=500, detail='Nenhuma alteração foi feita no plano de treino para usuário')
             else:
                 updated_user_plan = await db.user_plans.find_one({"_id": ObjectId(id)})
                 updated_user_plan["_id"] = str(updated_user_plan["_id"])
                 user_plans_logger.info(f'Plano de treino para usuário atualizado com sucesso: {updated_user_plan}')
                 return updated_user_plan
         
-        user_plans_logger.warning(f'Nenhuma informação para atualizar: {user_plan}')
-        raise HTTPException(status_code=404, detail='Nenhuma informação para atualizar')
+        user_plans_logger.warning(f'Nenhuma alteração foi feita no plano de treino para usuário: {plan}')
+        raise HTTPException(status_code=500, detail='Nenhuma alteração foi feita no plano de treino para usuário')
     
     except Exception as e:
         user_plans_logger.error(f'Erro ao atualizar plano de treino para usuário: {e}')
