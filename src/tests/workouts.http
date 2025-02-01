@@ -1,3 +1,4 @@
+### Criação de um treino
 POST http://localhost:8000/workouts
 Content-Type: application/json
 
@@ -5,6 +6,20 @@ Content-Type: application/json
   "title": "Treino de Força",
   "description": "Treino de musculação para aumentar força.",
   "rest_time": 60,
+  "type": "Musculação",
+  "category": "Força",
+  "created_at": "2025-02-01T12:00:00",
+  "updated_at": null
+}
+
+### Atualização de um treino
+PUT http://localhost:8000/workouts/679da2654a6926d21a9c70dd
+Content-Type: application/json
+
+{
+  "title": "Treino de Força Atualizado",
+  "description": "Treino de musculação para aumentar força.",
+  "rest_time": 120,
   "type": "Musculação",
   "category": "Força",
   "created_at": "2025-02-01T12:00:00",
