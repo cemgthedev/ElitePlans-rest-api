@@ -52,3 +52,21 @@ async def update_user(id: str, user: User):
         users_logger.error(f'Erro ao atualizar usuário: {e}')
         raise HTTPException(status_code=500, detail='Erro ao atualizar usuário')
     
+# Rota de exclusão de um usuário
+@router.delete('/users/{id}')
+async def delete_user(id: str):
+    try:
+        users_logger.info(f'Excluindo usuário: {id}')
+        await db.user_plans.delete_many({"user_id": ObjectId(id)})
+        response = await db.users.delete_one({"_id": ObjectId(id)})
+        
+        if response.deleted_count == 0:
+            users_logger.warning(f'Usuário não encontrado: {id}')
+            raise HTTPException(status_code=404, detail='Usuário não encontrado')
+        
+        users_logger.info(f'Usuário excluído com sucesso: {id}')
+        return {"message": "Usuário excluído com sucesso"}
+    
+    except Exception as e:
+        users_logger.error(f'Erro ao excluir usuário: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao excluir usuário')
