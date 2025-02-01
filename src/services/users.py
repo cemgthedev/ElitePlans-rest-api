@@ -70,3 +70,22 @@ async def delete_user(id: str):
     except Exception as e:
         users_logger.error(f'Erro ao excluir usuário: {e}')
         raise HTTPException(status_code=500, detail='Erro ao excluir usuário')
+    
+# Rota de busca de um usuário por id
+@router.get('/users/{id}')
+async def get_user(id: str):
+    try:
+        users_logger.info(f'Buscando usuário: {id}')
+        user = await db.users.find_one({"_id": ObjectId(id)})
+        
+        if not user:
+            users_logger.warning(f'Usuário não encontrado: {id}')
+            raise HTTPException(status_code=404, detail='Usuário não encontrado')
+        
+        user["_id"] = str(user["_id"])
+        users_logger.info(f'Usuário encontrado: {user}')
+        return user
+    
+    except Exception as e:
+        users_logger.error(f'Erro ao buscar usuário: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar usuário')
