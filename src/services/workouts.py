@@ -51,3 +51,22 @@ async def update_workout(id: str, workout: Workout):
     except Exception as e:
         workouts_logger.error(f'Erro ao atualizar treino: {e}')
         raise HTTPException(status_code=500, detail='Erro ao atualizar treino')
+    
+# Rota de exclusão de um treino
+@router.delete('/workouts/{id}')
+async def delete_workout(id: str):
+    try:
+        workouts_logger.info(f'Excluindo treino: {id}')
+        await db.exercises.delete_many({"workout_id": ObjectId(id)})
+        response = await db.workouts.delete_one({"_id": ObjectId(id)})
+
+        if response.deleted_count == 0:
+            workouts_logger.warning(f'Treino não encontrado: {id}')
+            raise HTTPException(status_code=404, detail='Treino não encontrado')
+        
+        workouts_logger.info(f'Treino excluído com sucesso: {id}')
+        return {"message": "Treino excluído com sucesso"}
+
+    except Exception as e:
+        workouts_logger.error(f'Erro ao excluir treino: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao excluir treino')
