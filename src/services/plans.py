@@ -1,5 +1,6 @@
+from typing import Optional
 from bson import ObjectId
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from database import db
 from models.plan import Plan
 from services.configs import plans_logger
@@ -102,6 +103,55 @@ async def get_plan(id: str):
     except Exception as e:
         plans_logger.error(f'Erro ao buscar plano: {e}')
         raise HTTPException(status_code=500, detail='Erro ao buscar plano')
+    
+# Rota de lista de planos
+@router.get('/plans')
+async def get_plans(
+    page: Optional[int] = Query(1, ge=1, description="Page number, starting from 1"),
+    limit: Optional[int] = Query(10, ge=1, le=100, description="Number of results per page (max 100)"),
+    subject: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by subject"),
+    type: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by type"),
+    category: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by category"),
+    min_price: Optional[float] = Query(None, ge=0, description="Filter by minimum price"),
+    max_price: Optional[float] = Query(None, ge=0, description="Filter by maximum price")
+):
+    try:
+        plans_logger.info(f'Buscando planos')
+        filters = []
+        
+        if subject:
+            filters.append({"$or": [{"title": {"$regex": subject, "$options": "i"}}, {"description": {"$regex": subject, "$options": "i"}}]})
+        
+        if type:
+            filters.append({"type": type})
+        
+        if category:
+            filters.append({"category": category})
+        
+        if min_price:
+            filters.append({"price": {"$gte": min_price}})
+        
+        if max_price:
+            filters.append({"price": {"$lte": max_price}})
+        
+        query = {"$and": filters} if filters else {}
+        
+        skip = (page - 1) * limit
+        plans = await db.plans.find(query).skip(skip).limit(limit).to_list(length=limit)
+        
+        for plan in plans:
+            plan["_id"] = str(plan["_id"])
+        
+        if len(plans) > 0:
+            plans_logger.info(f'Planos encontrados com sucesso: {plans}')
+            return plans
+        else:
+            plans_logger.warning(f'Nenhum plano encontrado')
+            raise HTTPException(status_code=404, detail='Nenhum plano encontrado')
+    
+    except Exception as e:
+        plans_logger.error(f'Erro ao buscar planos: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar planos')
     
 # Rota de quantidade de planos
 @router.get('/quantity/plans')
