@@ -1,5 +1,6 @@
+from typing import Optional
 from bson import ObjectId
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from database import db
 from models.user import User
 from services.configs import users_logger
@@ -12,6 +13,11 @@ router = APIRouter()
 async def create_user(user: User):
     try:
         users_logger.info(f'Criando usuário: {user}')
+        response = await db.users.find_one({"email": user.email})
+        if response:
+            users_logger.warning(f'Usuário com email {user.email} já cadastrado')
+            raise HTTPException(status_code=409, detail='Usuário com email já cadastrado')
+        
         user_dict = user.dict(by_alias=True, exclude={"id"})
         response = await db.users.insert_one(user_dict)
         
@@ -89,6 +95,44 @@ async def get_user(id: str):
     except Exception as e:
         users_logger.error(f'Erro ao buscar usuário: {e}')
         raise HTTPException(status_code=500, detail='Erro ao buscar usuário')
+    
+# Rota de listagem de usuários
+@router.get('/users')
+async def get_users(
+    page: Optional[int] = Query(1, ge=1, description="Page number, starting from 1"),
+    limit: Optional[int] = Query(10, ge=1, le=100, description="Number of results per page (max 100)"),
+    name: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by name"),
+    email: Optional[str] = Query(None, min_length=3, max_length=80, description="Filter by email"),
+    password: Optional[str] = Query(None, min_length=8, max_length=16, description="Filter by password"),
+):
+    try:
+        users_logger.info(f'Buscando usuários')
+        filters = []
+        
+        if name:
+            filters.append({"$text": {"$search": name}})
+        
+        if email and password:
+            filters.append({"email": email, "password": password})
+
+        query = {"$and": filters} if filters else {}
+        
+        skip = (page - 1) * limit
+        users = await db.users.find(query).skip(skip).limit(limit).to_list(length=limit)
+        
+        for user in users:
+            user["_id"] = str(user["_id"])
+        
+        if len(users) > 0:
+            users_logger.info(f'Usuários encontrados com sucesso: {users}')
+            return users
+        else:
+            users_logger.warning(f'Nenhum usuário encontrado')
+            raise HTTPException(status_code=404, detail='Nenhum usuário encontrado')
+    
+    except Exception as e:
+        users_logger.error(f'Erro ao buscar usuários: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar usuários')
     
 # Rota de quantidade de usuários
 @router.get('/quantity/users')
