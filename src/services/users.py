@@ -101,8 +101,8 @@ async def get_user(id: str):
 async def get_users(
     page: Optional[int] = Query(1, ge=1, description="Page number, starting from 1"),
     limit: Optional[int] = Query(10, ge=1, le=100, description="Number of results per page (max 100)"),
-    sort_by: Optional[Literal["name"]] = Query(None, min_length=3, max_length=120, description="Sort by field"),
-    order_by: Optional[Literal["asc", "desc"]] = Query(None, min_length=3, max_length=120, description="Order by field"),
+    sort_by: Optional[Literal["name"]] = Query(None, description="Sort by field"),
+    order_by: Optional[Literal["asc", "desc"]] = Query(None, description="Order by field"),
     name: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by name"),
     email: Optional[str] = Query(None, min_length=3, max_length=80, description="Filter by email"),
     password: Optional[str] = Query(None, min_length=8, max_length=16, description="Filter by password"),
