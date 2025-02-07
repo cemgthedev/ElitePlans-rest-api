@@ -32,5 +32,8 @@ DELETE http://localhost:8000/workouts/679da2654a6926d21a9c70de
 ### Busca de um treino pelo id
 GET http://localhost:8000/workouts/679e75c8eccc141407b61274
 
+### Listagem de treinos
+GET http://localhost:8000/workouts/?min_rest_time=43&subject=musculação
+
 ### Quantidade de exercícios
 GET http://localhost:8000/quantity/workouts

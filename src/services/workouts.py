@@ -1,5 +1,6 @@
+from typing import Optional
 from bson import ObjectId
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from database import db
 from models.workout import Workout
 from services.configs import workouts_logger
@@ -89,6 +90,55 @@ async def get_workout(id: str):
     except Exception as e:
         workouts_logger.error(f'Erro ao buscar treino: {e}')
         raise HTTPException(status_code=500, detail='Erro ao buscar treino')
+
+# Rota de listagem de treinos
+@router.get('/workouts')
+async def get_plans(
+    page: Optional[int] = Query(1, ge=1, description="Page number, starting from 1"),
+    limit: Optional[int] = Query(10, ge=1, le=100, description="Number of results per page (max 100)"),
+    subject: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by subject"),
+    type: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by type"),
+    category: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by category"),
+    min_rest_time: Optional[float] = Query(None, ge=0, description="Filter by minimum rest time"),
+    max_rest_time: Optional[float] = Query(None, ge=0, description="Filter by maximum rest time")
+):
+    try:
+        workouts_logger.info(f'Buscando treinos')
+        filters = []
+        
+        if subject:
+            filters.append({"$or": [{"title": {"$regex": subject, "$options": "i"}}, {"description": {"$regex": subject, "$options": "i"}}]})
+        
+        if type:
+            filters.append({"type": type})
+        
+        if category:
+            filters.append({"category": category})
+        
+        if min_rest_time:
+            filters.append({"rest_time": {"$gte": min_rest_time}})
+        
+        if max_rest_time:
+            filters.append({"rest_time": {"$lte": max_rest_time}})
+        
+        query = {"$and": filters} if filters else {}
+        
+        skip = (page - 1) * limit
+        workouts = await db.workouts.find(query).skip(skip).limit(limit).to_list(length=limit)
+        
+        for workout in workouts:
+            workout["_id"] = str(workout["_id"])
+        
+        if len(workouts) > 0:
+            workouts_logger.info(f'Treinos encontrados com sucesso: {workouts}')
+            return workouts
+        else:
+            workouts_logger.warning(f'Nenhum treino encontrado')
+            raise HTTPException(status_code=404, detail='Nenhum treino encontrado')
+    
+    except Exception as e:
+        workouts_logger.error(f'Erro ao buscar treinos: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar treinos')
     
 # Rota de quantidade de treinos
 @router.get('/quantity/workouts')
