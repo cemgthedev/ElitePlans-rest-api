@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Query
 from database import db
@@ -96,6 +96,8 @@ async def get_workout(id: str):
 async def get_workouts(
     page: Optional[int] = Query(1, ge=1, description="Page number, starting from 1"),
     limit: Optional[int] = Query(10, ge=1, le=100, description="Number of results per page (max 100)"),
+    sort_by: Optional[Literal["title", "type", "category", "rest_time"]] = Query(None, description="Sort by field"),
+    order_by: Optional[Literal["asc", "desc"]] = Query(None, description="Order by field"),
     subject: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by subject"),
     type: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by type"),
     category: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by category"),
@@ -124,7 +126,18 @@ async def get_workouts(
         query = {"$and": filters} if filters else {}
         
         skip = (page - 1) * limit
-        workouts = await db.workouts.find(query).skip(skip).limit(limit).to_list(length=limit)
+        
+        order_direction = None
+        if order_by == "asc":
+            order_direction = 1
+        elif order_by == "desc":
+            order_direction = -1
+        
+        workouts = []
+        if sort_by and order_direction:
+            workouts = await db.workouts.find(query).sort(sort_by, order_direction).skip(skip).limit(limit).to_list(length=limit)
+        else:
+            workouts = await db.workouts.find(query).skip(skip).limit(limit).to_list(length=limit)
         
         for workout in workouts:
             workout["_id"] = str(workout["_id"])

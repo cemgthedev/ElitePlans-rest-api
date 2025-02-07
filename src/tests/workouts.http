@@ -13,14 +13,14 @@ Content-Type: application/json
 }
 
 ### Atualização de um treino
-PUT http://localhost:8000/workouts/679da2654a6926d21a9c70de
+PUT http://localhost:8000/workouts/679e75c8eccc141407b61274
 Content-Type: application/json
 
 {
   "title": "Treino de Força tAtualizado",
   "description": "Treino de musculação para aumentar força.",
   "rest_time": 120,
-  "type": "Musculação",
+  "type": "Crossfit",
   "category": "Força",
   "created_at": "2025-02-01T12:00:00",
   "updated_at": null
@@ -33,7 +33,7 @@ DELETE http://localhost:8000/workouts/679da2654a6926d21a9c70de
 GET http://localhost:8000/workouts/679e75c8eccc141407b61274
 
 ### Listagem de treinos
-GET http://localhost:8000/workouts/?min_rest_time=43&subject=musculação
+GET http://localhost:8000/workouts/?order_by=desc&sort_by=rest_time
 
 ### Quantidade de exercícios
 GET http://localhost:8000/quantity/workouts
