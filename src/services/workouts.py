@@ -93,7 +93,7 @@ async def get_workout(id: str):
 
 # Rota de listagem de treinos
 @router.get('/workouts')
-async def get_plans(
+async def get_workouts(
     page: Optional[int] = Query(1, ge=1, description="Page number, starting from 1"),
     limit: Optional[int] = Query(10, ge=1, le=100, description="Number of results per page (max 100)"),
     subject: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by subject"),
