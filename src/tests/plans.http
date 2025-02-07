@@ -3,7 +3,7 @@ POST http://localhost:8000/plans
 Content-Type: application/json
 
 {
-  "title": "Plano Premium",
+  "title": "Treino Premium",
   "description": "Acesso completo a todas as funcionalidades.",
   "type": "Mensal",
   "category": "Fitness",
@@ -12,16 +12,16 @@ Content-Type: application/json
 }
 
 ### Atualização de um plano
-PUT http://localhost:8000/plans/679d9f3758e143db4df606d7
+PUT http://localhost:8000/plans/67a5f991b74cf827396ee412
 Content-Type: application/json
 
 {
-  "title": "Plano Premium",
+  "title": "Treino Super Premium",
   "description": "Acesso completo a todas as funcionalidades.",
-  "type": "Mensal",
-  "category": "Fitness",
-  "price": 99.99,
-  "seller_id": "679d9e51ab0051798fd5f71e"
+  "type": "Anual",
+  "category": "Crossfit",
+  "price": 9999999.99,
+  "seller_id": "679d9ef658e143db4df606d6"
 }
 
 ### Remoção de um plano
@@ -31,7 +31,7 @@ DELETE http://localhost:8000/plans/679d9f3758e143db4df606d7
 GET http://localhost:8000/plans/679e76cd4d48dca26484decb
 
 ### Listagem de planos
-GET http://localhost:8000/plans/?subject=todas
+GET http://localhost:8000/plans/?order_by=asc&sort_by=price
 
 ### Quantidade de planos
 GET http://localhost:8000/quantity/plans
