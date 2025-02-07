@@ -15,24 +15,27 @@ Content-Type: application/json
     "neighborhood": "Bela Vista",
     "city": "São Paulo",
     "state": "SP"
-  },
-  "updated_at": null
+  }
 }
 
 ### Atualização de um usuário
-PUT http://localhost:8000/users/679d9e36ef936b8a7a1ecee7
+PUT http://localhost:8000/users/679d9e61ab0051798fd5f720
 Content-Type: application/json
 
 {
-  "name": "João Silva",
-  "email": "joao.sidsdfslva@email.com",
-  "password": "senha1234update",
+  "name": "Eduardo Silva",
+  "email": "joao.silva@example.com",
+  "password": "SenhaSegura123",
   "cpf": "12345678901",
-  "phone_number": "+55 11 91234-5678",
-  "purchased_plans": [],
-  "created_plans": [],
-  "created_at": "2025-01-31T12:00:00",
-  "updated_at": null
+  "phone_number": "11987654321",
+  "address": {
+    "cep": "01001000",
+    "street": "Avenida Paulista",
+    "number": "1000",
+    "neighborhood": "Bela Vista",
+    "city": "São Paulo",
+    "state": "SP"
+  }
 }
 
 ### Remoção de um usuário
@@ -42,7 +45,7 @@ DELETE http://localhost:8000/users/679d9e36ef936b8a7a1ecee7
 GET http://localhost:8000/users/679e77d66f2b139bd60798ab
 
 ### Lista usuários
-GET http://localhost:8000/users/?name=joãfo&email=jofao.sidlva@email.com&password=senha1234
+GET http://localhost:8000/users/?order_by=desc&sort_by=name&limit=20
 
 ### Quantidade de usuários
 GET http://localhost:8000/quantity/users
