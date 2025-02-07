@@ -1,5 +1,6 @@
+from typing import Optional
 from bson import ObjectId
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from database import db
 from models.exercise import Exercise
 from services.configs import exercises_logger
@@ -98,6 +99,63 @@ async def get_exercise(id: str):
     except Exception as e:
         exercises_logger.error(f'Erro ao buscar exercício: {e}')
         raise HTTPException(status_code=500, detail='Erro ao buscar exercício')
+
+# Rota de listagem de exercícios
+@router.get('/exercises')
+async def get_exercises(
+    page: Optional[int] = Query(1, ge=1, description="Page number, starting from 1"),
+    limit: Optional[int] = Query(10, ge=1, le=100, description="Number of results per page (max 100)"),
+    title: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by title"),
+    min_sections: Optional[int] = Query(None, ge=0, description="Filter by minimum number of sections"),
+    max_sections: Optional[int] = Query(None, ge=0, description="Filter by maximum number of sections"),
+    min_reps: Optional[int] = Query(None, ge=0, description="Filter by minimum number of repetitions"),
+    max_reps: Optional[int] = Query(None, ge=0, description="Filter by maximum number of repetitions"),
+    min_weight: Optional[float] = Query(None, ge=0, description="Filter by minimum weight"),
+    max_weight: Optional[float] = Query(None, ge=0, description="Filter by maximum weight")
+):
+    try:
+        exercises_logger.info(f'Buscando exercícios')
+        filters = []
+        
+        if title:
+            filters.append({"title": {"$regex": title, "$options": "i"}})
+      
+        if min_sections:
+            filters.append({"n_sections": {"$gte": min_sections}})
+        
+        if max_sections:
+            filters.append({"n_sections": {"$lte": max_sections}})
+        
+        if min_reps:
+            filters.append({"n_reps": {"$gte": min_reps}})
+        
+        if max_reps:
+            filters.append({"n_reps": {"$lte": max_reps}})
+        
+        if min_weight:
+            filters.append({"weight": {"$gte": min_weight}})
+        
+        if max_weight:
+            filters.append({"weight": {"$lte": max_weight}})
+        
+        query = {"$and": filters} if filters else {}
+        
+        skip = (page - 1) * limit
+        exercises = await db.exercises.find(query).skip(skip).limit(limit).to_list(length=limit)
+        
+        for exercise in exercises:
+            exercise["_id"] = str(exercise["_id"])
+        
+        if len(exercises) > 0:
+            exercises_logger.info(f'Exercícios encontrados com sucesso: {exercises}')
+            return exercises
+        else:
+            exercises_logger.warning(f'Nenhum exercício encontrado')
+            raise HTTPException(status_code=404, detail='Nenhum exercício encontrado')
+    
+    except Exception as e:
+        exercises_logger.error(f'Erro ao buscar exercícios: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar exercícios')
     
 # Rota de quantidade de exercícios
 @router.get('/quantity/exercises')
