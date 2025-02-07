@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Query
 from database import db
@@ -105,6 +105,8 @@ async def get_exercise(id: str):
 async def get_exercises(
     page: Optional[int] = Query(1, ge=1, description="Page number, starting from 1"),
     limit: Optional[int] = Query(10, ge=1, le=100, description="Number of results per page (max 100)"),
+    sort_by: Optional[Literal["title", "n_sections", "n_reps", "weight"]] = Query(None, description="Sort by field"),
+    order_by: Optional[Literal["asc", "desc"]] = Query(None, description="Order by field"),
     title: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by title"),
     min_sections: Optional[int] = Query(None, ge=0, description="Filter by minimum number of sections"),
     max_sections: Optional[int] = Query(None, ge=0, description="Filter by maximum number of sections"),
@@ -141,7 +143,18 @@ async def get_exercises(
         query = {"$and": filters} if filters else {}
         
         skip = (page - 1) * limit
-        exercises = await db.exercises.find(query).skip(skip).limit(limit).to_list(length=limit)
+        
+        order_direction = None
+        if order_by == "asc":
+            order_direction = 1
+        elif order_by == "desc":
+            order_direction = -1
+        
+        exercises = []
+        if sort_by and order_direction:
+            exercises = await db.exercises.find(query).sort(sort_by, order_direction).skip(skip).limit(limit).to_list(length=limit)
+        else:
+            exercises = await db.exercises.find(query).skip(skip).limit(limit).to_list(length=limit)
         
         for exercise in exercises:
             exercise["_id"] = str(exercise["_id"])
