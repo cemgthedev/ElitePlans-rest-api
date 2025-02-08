@@ -50,8 +50,14 @@ GET http://localhost:8000/users/?order_by=desc&sort_by=name&limit=20
 ### Quantidade de usuários
 GET http://localhost:8000/quantity/users
 
+### Busca de vendedor por id
+GET http://localhost:8000/seller_plans/67a79cd8a86f0c4ab98ab19d
+
 ### Listagem dos planos dos vendedores
 GET http://localhost:8000/seller_plans/?sort_by=name&order_by=desc&limit=1
+
+### Busca de comprador por id
+GET http://localhost:8000/buyer_plans/67a79cd8a86f0c4ab98ab19d
 
 ### Listagem dos planos dos compradores
 GET http://localhost:8000/buyer_plans/?sort_by=name&order_by=desc&limit=1

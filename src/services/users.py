@@ -163,6 +163,53 @@ async def get_users_quantity():
         users_logger.error(f'Erro ao buscar quantidade de usuários: {e}')
         raise HTTPException(status_code=500, detail='Erro ao buscar quantidade de usuários')
     
+# Rota de listagem dos planos de um vendedor
+@router.get('/seller_plans/{id}')
+async def get_seller_plans_by_id(id: str):
+    try:
+        users_logger.info(f'Buscando planos do vendedor')
+        
+        filters = []
+        filters.append({"_id": ObjectId(id)})
+        filters.append({ "plans_sold": { "$exists": True, "$ne": [] }})
+        
+        query = {"$and": filters}
+        
+        pipeline = [
+            {"$match": query},
+            {
+                "$lookup": {
+                    "from": "plans",
+                    "localField": "plans_sold",
+                    "foreignField": "_id",
+                    "as": "plans_sold_details"
+                }
+            },
+            {
+                "$project": {"purchased_plans": 0}
+            }
+        ]
+        
+        user = await db.users.aggregate(pipeline).to_list(length=1)
+            
+        if user:
+            user_dict = dict(user[0])
+            user_dict["_id"] = str(user_dict["_id"])
+            user_dict["plans_sold"] = [str(plan_id) for plan_id in user_dict["plans_sold"]]
+            
+            for plan in user_dict["plans_sold_details"]:
+                plan["_id"] = str(plan["_id"])
+            
+            users_logger.info(f'Vendedor encontrado com sucesso: {user_dict}')
+            return user_dict
+        else:
+            users_logger.warning(f'Nenhum vendedor encontrado')
+            raise HTTPException(status_code=404, detail='Nenhum vendedor encontrado')
+
+    except Exception as e:
+        users_logger.error(f'Erro ao buscar planos do vendedor: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar planos do vendedor')
+    
 # Rota de listagem dos planos dos vendedores
 @router.get('/seller_plans')
 async def get_seller_plans(
@@ -236,6 +283,54 @@ async def get_seller_plans(
     except Exception as e:
         users_logger.error(f'Erro ao buscar planos dos vendedores: {e}')
         raise HTTPException(status_code=500, detail='Erro ao buscar planos dos vendedores')
+    
+
+# Rota de listagem dos planos de um comprador
+@router.get('/buyer_plans/{id}')
+async def get_buyer_plans_by_id(id: str):
+    try:
+        users_logger.info(f'Buscando planos do comprador')
+        
+        filters = []
+        filters.append({"_id": ObjectId(id)})
+        filters.append({ "purchased_plans": { "$exists": True, "$ne": [] }})
+        
+        query = {"$and": filters}
+        
+        pipeline = [
+            {"$match": query},
+            {
+                "$lookup": {
+                    "from": "plans",
+                    "localField": "purchased_plans",
+                    "foreignField": "_id",
+                    "as": "purchased_plans_details"
+                }
+            },
+            {
+                "$project": {"plans_sold": 0}
+            }
+        ]
+        
+        user = await db.users.aggregate(pipeline).to_list(length=1)
+            
+        if user:
+            user_dict = dict(user[0])
+            user_dict["_id"] = str(user_dict["_id"])
+            user_dict["purchased_plans"] = [str(plan_id) for plan_id in user_dict["purchased_plans"]]
+            
+            for plan in user_dict["purchased_plans_details"]:
+                plan["_id"] = str(plan["_id"])
+            
+            users_logger.info(f'Comprador encontrado com sucesso: {user_dict}')
+            return user_dict
+        else:
+            users_logger.warning(f'Nenhum comprador encontrado')
+            raise HTTPException(status_code=404, detail='Nenhum comprador encontrado')
+
+    except Exception as e:
+        users_logger.error(f'Erro ao buscar planos do comprador: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar planos do comprador')
     
 # Rota de listagem dos planos dos compradores
 @router.get('/buyer_plans')
