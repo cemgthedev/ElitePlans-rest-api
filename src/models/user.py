@@ -18,5 +18,7 @@ class User(BaseModel):
     cpf: str = Field(min_length=11, max_length=11)
     phone_number: str
     address: Address
+    plans_sold: Optional[list[str]] = []
+    purchased_plans: Optional[list[str]] = []
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: Optional[datetime] = Field(default=None)

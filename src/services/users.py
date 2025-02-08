@@ -122,9 +122,9 @@ async def get_users(
         skip = (page - 1) * limit
         
         order_direction = None
-        if order_by == "asc":
+        if sort_by and order_by == "asc":
             order_direction = 1
-        elif order_by == "desc":
+        elif sort_by and order_by == "desc":
             order_direction = -1
         
         users = []
@@ -135,6 +135,8 @@ async def get_users(
         
         for user in users:
             user["_id"] = str(user["_id"])
+            user["plans_sold"] = [str(plan_id) for plan_id in user["plans_sold"]]
+            user["purchased_plans"] = [str(plan_id) for plan_id in user["purchased_plans"]]
         
         if len(users) > 0:
             users_logger.info(f'Usuários encontrados com sucesso: {users}')
@@ -160,3 +162,151 @@ async def get_users_quantity():
     except Exception as e:
         users_logger.error(f'Erro ao buscar quantidade de usuários: {e}')
         raise HTTPException(status_code=500, detail='Erro ao buscar quantidade de usuários')
+    
+# Rota de listagem dos planos dos vendedores
+@router.get('/seller_plans')
+async def get_seller_plans(
+    page: Optional[int] = Query(1, ge=1, description="Page number, starting from 1"),
+    limit: Optional[int] = Query(10, ge=1, le=100, description="Number of results per page (max 100)"),
+    sort_by: Optional[Literal["name"]] = Query(None, description="Sort by field"),
+    order_by: Optional[Literal["asc", "desc"]] = Query(None, description="Order by field"),
+    name: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by name"),
+    email: Optional[str] = Query(None, min_length=3, max_length=80, description="Filter by email"),
+    password: Optional[str] = Query(None, min_length=8, max_length=16, description="Filter by password"),
+):
+    try:
+        users_logger.info(f'Buscando planos dos vendedores')
+        
+        filters = []
+        
+        if name:
+            filters.append({"$text": {"$search": name}})
+        
+        if email and password:
+            filters.append({"email": email, "password": password})
+            
+        filters.append({ "plans_sold": { "$exists": True, "$ne": [] }})
+        
+        query = {"$and": filters}
+        
+        pipeline = [
+            {"$match": query},
+            {
+                "$lookup": {
+                    "from": "plans",
+                    "localField": "plans_sold",
+                    "foreignField": "_id",
+                    "as": "plans_sold_details"
+                }
+            },
+            {
+                "$project": {"purchased_plans": 0}
+            }
+        ]
+        
+        skip = (page - 1) * limit
+        pipeline.append({"$skip": skip})
+        pipeline.append({"$limit": limit})
+        
+        order_direction = None
+        if sort_by and order_by == "asc":
+            order_direction = 1
+        elif sort_by and order_by == "desc":
+            order_direction = -1
+        
+        if sort_by and order_direction:
+            pipeline.append({"$sort": {sort_by: order_direction}})
+        
+        users = await db.users.aggregate(pipeline).to_list(length=None)
+        
+        for user in users:
+            user["_id"] = str(user["_id"])
+            user["plans_sold"] = [str(plan_id) for plan_id in user["plans_sold"]]
+            
+            for plan in user["plans_sold_details"]:
+                plan["_id"] = str(plan["_id"])
+            
+        if len(users) > 0:
+            users_logger.info(f'Vendedores encontrados com sucesso: {users}')
+            return users
+        else:
+            users_logger.warning(f'Nenhum vendedor encontrado')
+            raise HTTPException(status_code=404, detail='Nenhum vendedor encontrado')
+
+    except Exception as e:
+        users_logger.error(f'Erro ao buscar planos dos vendedores: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar planos dos vendedores')
+    
+# Rota de listagem dos planos dos compradores
+@router.get('/buyer_plans')
+async def get_buyer_plans(
+    page: Optional[int] = Query(1, ge=1, description="Page number, starting from 1"),
+    limit: Optional[int] = Query(10, ge=1, le=100, description="Number of results per page (max 100)"),
+    sort_by: Optional[Literal["name"]] = Query(None, description="Sort by field"),
+    order_by: Optional[Literal["asc", "desc"]] = Query(None, description="Order by field"),
+    name: Optional[str] = Query(None, min_length=3, max_length=120, description="Filter by name"),
+    email: Optional[str] = Query(None, min_length=3, max_length=80, description="Filter by email"),
+    password: Optional[str] = Query(None, min_length=8, max_length=16, description="Filter by password"),
+):
+    try:
+        users_logger.info(f'Buscando planos dos compradores')
+        
+        filters = []
+        
+        if name:
+            filters.append({"$text": {"$search": name}})
+        
+        if email and password:
+            filters.append({"email": email, "password": password})
+            
+        filters.append({ "purchased_plans": { "$exists": True, "$ne": [] }})
+        
+        query = {"$and": filters}
+        
+        pipeline = [
+            {"$match": query},
+            {
+                "$lookup": {
+                    "from": "plans",
+                    "localField": "purchased_plans",
+                    "foreignField": "_id",
+                    "as": "purchased_plans_details"
+                }
+            },
+            {
+                "$project": {"plans_sold": 0}
+            }
+        ]
+        
+        skip = (page - 1) * limit
+        pipeline.append({"$skip": skip})
+        pipeline.append({"$limit": limit})
+        
+        order_direction = None
+        if sort_by and order_by == "asc":
+            order_direction = 1
+        elif sort_by and order_by == "desc":
+            order_direction = -1
+        
+        if sort_by and order_direction:
+            pipeline.append({"$sort": {sort_by: order_direction}})
+        
+        users = await db.users.aggregate(pipeline).to_list(length=None)
+        
+        for user in users:
+            user["_id"] = str(user["_id"])
+            user["purchased_plans"] = [str(plan_id) for plan_id in user["purchased_plans"]]
+            
+            for plan in user["purchased_plans_details"]:
+                plan["_id"] = str(plan["_id"])
+            
+        if len(users) > 0:
+            users_logger.info(f'Compradores encontrados com sucesso: {users}')
+            return users
+        else:
+            users_logger.warning(f'Nenhum comprador encontrado')
+            raise HTTPException(status_code=404, detail='Nenhum comprador encontrado')
+
+    except Exception as e:
+        users_logger.error(f'Erro ao buscar planos dos compradores: {e}')
+        raise HTTPException(status_code=500, detail='Erro ao buscar planos dos compradores')

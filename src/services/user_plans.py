@@ -81,6 +81,17 @@ async def update_user_plan(id: str, user_plan: UserPlans):
             else:
                 updated_user_plan = await db.user_plans.find_one({"_id": ObjectId(id)})
                 updated_user_plan["_id"] = str(updated_user_plan["_id"])
+                    
+                seller_dict = dict(seller)
+                seller_dict.pop("_id")
+                seller_dict["plans_sold"].append(ObjectId(user_plan.plan_id))
+                await db.users.update_one({"_id": ObjectId(user_plan.seller_id)}, {"$set": seller_dict})
+                
+                buyer_dict = dict(buyer)
+                buyer_dict.pop("_id")
+                buyer_dict["purchased_plans"].append(ObjectId(user_plan.plan_id))
+                await db.users.update_one({"_id": ObjectId(user_plan.buyer_id)}, {"$set": buyer_dict})
+                
                 user_plans_logger.info(f'Plano de treino para usuário atualizado com sucesso: {updated_user_plan}')
                 return updated_user_plan
         

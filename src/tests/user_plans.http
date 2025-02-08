@@ -3,24 +3,24 @@ POST http://localhost:8000/user_plans
 Content-Type: application/json
 
 {
-  "seller_id": "679d9e54ab0051798fd5f71f",
-  "buyer_id": "679d9e61ab0051798fd5f720",
+  "seller_id": "67a79cd8a86f0c4ab98ab19d",
+  "buyer_id": "67a79ce5a86f0c4ab98ab19e",
   "plan_id": "679d9f3a58e143db4df606d8"
 }
 
 ### Atualização de plano para usuário
-PUT http://localhost:8000/user_plans/679e32a7dbbb3d374893dfa2
+PUT http://localhost:8000/user_plans/67a7a87cf8cbb1a49fabb29f
 Content-Type: application/json
 
 {
-  "seller_id": "679d9e36ef936b8a7a1ecee7",
-  "buyer_id": "679d9e54ab0051798fd5f71f",
-  "plan_id": "679d9f3758e143db4df606d7",
+  "seller_id": "67a79cd8a86f0c4ab98ab19d",
+  "buyer_id": "67a79ce5a86f0c4ab98ab19e",
+  "plan_id": "679d9f3a58e143db4df606d8",
   "purchased": true
 }
 
 ### Remoção de plano para usuário
-DELETE http://localhost:8000/user_plans/679e32a7dbbb3d374893dfa2
+DELETE http://localhost:8000/user_plans/67a79243348789526b301233
 
 ### Quantidade de planos dos usuários
 GET http://localhost:8000/quantity/user_plans

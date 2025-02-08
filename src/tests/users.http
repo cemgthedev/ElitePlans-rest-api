@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "name": "João Silva",
-  "email": "joao.silva@example.com",
+  "email": "joao.dddsilva@example.com",
   "password": "SenhaSegura123",
   "cpf": "12345678901",
   "phone_number": "11987654321",
@@ -42,10 +42,16 @@ Content-Type: application/json
 DELETE http://localhost:8000/users/679d9e36ef936b8a7a1ecee7
 
 ### Busca de um usuário pelo id
-GET http://localhost:8000/users/679e77d66f2b139bd60798ab
+GET http://localhost:8000/users/679d9e54ab0051798fd5f71f
 
 ### Lista usuários
 GET http://localhost:8000/users/?order_by=desc&sort_by=name&limit=20
 
 ### Quantidade de usuários
 GET http://localhost:8000/quantity/users
+
+### Listagem dos planos dos vendedores
+GET http://localhost:8000/seller_plans/?sort_by=name&order_by=desc&limit=1
+
+### Listagem dos planos dos compradores
+GET http://localhost:8000/buyer_plans/?sort_by=name&order_by=desc&limit=1
