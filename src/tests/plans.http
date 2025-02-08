@@ -28,7 +28,7 @@ Content-Type: application/json
 DELETE http://localhost:8000/plans/679d9f3758e143db4df606d7
 
 ### Busca de um plano pelo id
-GET http://localhost:8000/plans/679e76cd4d48dca26484decb
+GET http://localhost:8000/plans/67a797fe0bcd0d6619e9fd16
 
 ### Listagem de planos
 GET http://localhost:8000/plans/?order_by=asc&sort_by=price
